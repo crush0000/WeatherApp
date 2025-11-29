@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         setupRetrofit()
         database = AppDatabase.getInstance(this)
 
-        // При открытии приложения — пытаемся показать последний кэшированный город
+
         loadLastCachedWeather()
 
         getWeatherButton.setOnClickListener {
@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
                     apiService.getWeather(city, API_KEY)
                 }
 
-                // Сохраняем в Room
+
                 val entity = WeatherEntity(
                     city = city,
                     temp = response.main.temp,
@@ -129,14 +129,12 @@ class MainActivity : AppCompatActivity() {
                 displayWeather(response.main.temp, response.weather[0].description, response.weather[0].icon)
 
             } catch (e: IOException) {
-                // Нет интернета — пытаемся взять из кэша
                 val cached = withContext(Dispatchers.IO) {
                     database.weatherDao().getWeatherByCity(city)
                 }
                 if (cached != null) {
                     saveLastCity(city)
                     displayWeather(cached.temp, cached.description, cached.icon)
-                    // Ошибка НЕ показывается — требование выполнено
                 } else {
                     showError("Нет подключения к интернету")
                 }
